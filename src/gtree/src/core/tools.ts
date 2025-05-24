@@ -11,33 +11,17 @@ export function registerTools(server: FastMCP) {
   // Gtree tool
   server.addTool({
     name: "gtree",
-    description: "Generate a tree view of directory structure, respecting .gitignore patterns (similar to tree command with fd filtering)",
+    description: "Generate a tree view of directory structure, respecting .gitignore patterns by using 'fd' and 'tree' commands.",
     parameters: z.object({
       path: z.string().optional().describe("Target directory path (default: current directory)"),
-      maxDepth: z.number().optional().describe("Maximum depth to traverse (equivalent to -L flag)"),
-      showHidden: z.boolean().optional().describe("Show hidden files (equivalent to -a flag)"),
-      args: z.array(z.string()).optional().describe("Additional tree-style arguments like ['-L', '2'] or ['-a']")
+      args: z.array(z.string()).optional().describe("Additional arguments to pass to the underlying 'tree' command (e.g., ['-L', '2', '-d', '--dirsfirst']). '.gitignore' is respected via 'fd'.")
     }),
     execute: async (params) => {
       try {
-        // Parse arguments if provided
-        let targetPath = params.path || '.';
-        let options: services.GtreeOptions = {
-          maxDepth: params.maxDepth,
-          showHidden: params.showHidden || false,
-          excludeGit: true
-        };
+        const targetPath = params.path || '.';
+        const treeArgs = params.args || [];
 
-        // If args are provided, parse them
-        if (params.args && params.args.length > 0) {
-          const parsed = services.GtreeService.parseTreeArgs(params.args);
-          if (parsed.path !== '.') {
-            targetPath = parsed.path;
-          }
-          options = { ...options, ...parsed.options };
-        }
-
-        const result = await services.GtreeService.generateTree(targetPath, options);
+        const result = await services.GtreeService.generateTree(targetPath, treeArgs);
         return result;
       } catch (error) {
         return `Error: ${error instanceof Error ? error.message : 'Unknown error'}`;

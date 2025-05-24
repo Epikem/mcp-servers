@@ -1,16 +1,34 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "esModuleInterop": true,
-    "strict": true,
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "types": [
+      "vitest/globals",
+      "node"
+    ],
+    "allowImportingTsExtensions": false,
+    "noEmit": false,
+    "outDir": "build",
     "skipLibCheck": true,
-    "outDir": "dist",
-    "sourceMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
     "declaration": true,
-    "resolveJsonModule": true
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "tests"
+  ]
 }

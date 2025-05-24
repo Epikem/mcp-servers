@@ -3,7 +3,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6)
 
-MCP server that provides directory tree visualization with git-aware filtering
+Vibe coded MCP server that provides directory tree visualization with git-aware filtering
 
 ## 📋 Usage
 
