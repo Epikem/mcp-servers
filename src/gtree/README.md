@@ -1,5 +1,7 @@
 # @epikem/gtree
 
+⚠️ **Warning**: This project was generated using AI assistance and may contain bugs or unexpected behavior. Use at your own risk and thoroughly test before using in production environments.
+
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6)
 
