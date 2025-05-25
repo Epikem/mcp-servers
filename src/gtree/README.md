@@ -28,6 +28,7 @@ This MCP server provides:
 - **Fast performance**: Built with Node.js filesystem APIs for optimal performance
 - **TypeScript**: Full TypeScript implementation for type safety
 - **Dual mode**: Works as both MCP server tool and standalone CLI
+- **Base path configuration**: Set a custom base directory using environment variables
 
 ## 🚀 Getting Started
 
@@ -46,7 +47,10 @@ This MCP server provides:
      "mcpServers": {
        "gtree": {
          "command": "npx",
-         "args": ["@epikem/gtree"]
+         "args": ["@epikem/gtree"],
+         "env": {
+           "GTREE_BASE_PATH": "/path/to/your/project"
+         }
        }
      }
    }
@@ -65,6 +69,27 @@ npm install -g @epikem/gtree
 # Or use with npx
 npx @epikem/gtree [path] [options]
 ```
+
+## ⚙️ Configuration
+
+### Environment Variables
+
+- **`GTREE_BASE_PATH`**: Set a custom base directory for all operations. When set:
+  - Relative paths in `gtree` tool will be resolved relative to this base path
+  - The `cwd` tool will return this path instead of the actual current working directory
+  - Absolute paths will still work as expected
+
+**Example:**
+
+```bash
+# Set base path to your project directory
+export GTREE_BASE_PATH="/Users/username/my-project"
+
+# Now all relative paths will be resolved from /Users/username/my-project
+gtree("src")  # Will show /Users/username/my-project/src
+```
+
+This is particularly useful when using gtree as an MCP server where the actual working directory might not be your project directory.
 
 ## 📖 Tool Usage
 
@@ -98,6 +123,24 @@ gtree({ args: ["-L", "3", "-a"] });
 gtree({ path: "./docs", args: ["-L", "2"] });
 ```
 
+### MCP Tool: `cwd`
+
+Get current working directory information.
+
+**Parameters:**
+
+- `basePath` (optional): Base path to calculate relative path from
+
+**Examples:**
+
+```typescript
+// Get current working directory
+cwd();
+
+// Get relative path from a base directory
+cwd({ basePath: "/Users/username/projects" });
+```
+
 ### CLI Usage
 
 ```bash
@@ -124,6 +167,7 @@ gtree ./src -L 3 -a
 3. **Tree formatting**: Uses Unicode box-drawing characters for clean tree visualization
 4. **Depth control**: Respects maximum depth settings to prevent overly deep trees
 5. **Sorting**: Directories appear first, followed by files, both sorted alphabetically
+6. **Base path resolution**: When `GTREE_BASE_PATH` is set, all relative paths are resolved from that directory
 
 ## 🎯 Examples
 

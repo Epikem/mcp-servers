@@ -3,11 +3,33 @@ import * as path from 'node:path';
 import * as fs from 'node:fs';
 
 export class GtreeService {
+    /**
+     * Resolve target path considering GTREE_BASE_PATH environment variable
+     * @param targetPath The target path to resolve
+     * @returns Resolved absolute path
+     */
+    private static resolveTargetPath(targetPath: string): string {
+        const basePath = process.env.GTREE_BASE_PATH;
+
+        if (!basePath) {
+            // No base path set, resolve relative to current working directory
+            return path.resolve(targetPath);
+        }
+
+        if (path.isAbsolute(targetPath)) {
+            // Target path is already absolute, use as-is
+            return targetPath;
+        }
+
+        // Target path is relative, resolve relative to base path
+        return path.resolve(basePath, targetPath);
+    }
+
     public static async generateTree(
         targetPath: string = '.',
         treeArgs: string[] = []
     ): Promise<string> {
-        const absolutePath = path.resolve(targetPath);
+        const absolutePath = this.resolveTargetPath(targetPath);
 
         if (!fs.existsSync(absolutePath)) {
             throw new Error(`Path does not exist: ${targetPath}`);

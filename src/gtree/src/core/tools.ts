@@ -28,4 +28,29 @@ export function registerTools(server: FastMCP) {
       }
     }
   });
+
+  // Current Working Directory tool
+  server.addTool({
+    name: "cwd",
+    description: "Get the current working directory information.",
+    parameters: z.object({
+      basePath: z.string().optional().describe("Base path to calculate relative path from (optional)")
+    }),
+    execute: async (params) => {
+      try {
+        if (params.basePath) {
+          const result = await services.CwdService.getCwdInfo(params.basePath);
+          return `Current working directory:
+Absolute path: ${result.absolute}
+Base path: ${result.basePath}
+Relative path: ${result.relative || '(same as base)'}`;
+        } else {
+          const result = await services.CwdService.getCurrentWorkingDirectory();
+          return `Current working directory: ${result}`;
+        }
+      } catch (error) {
+        return `Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      }
+    }
+  });
 }

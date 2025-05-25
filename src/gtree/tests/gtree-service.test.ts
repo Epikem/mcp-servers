@@ -59,12 +59,18 @@ describe('GtreeService', () => {
         vi.mocked(fs.existsSync).mockReturnValue(true);
         vi.mocked(fs.statSync).mockReturnValue({ isDirectory: () => true } as any);
         vi.mocked(path.resolve).mockImplementation((p) => `/abs/${p}`);
+        vi.mocked(path.isAbsolute).mockImplementation((p) => p.startsWith('/'));
         vi.mocked(path.basename).mockImplementation((p) => p.substring(p.lastIndexOf('/') + 1));
         vi.spyOn(console, 'warn').mockImplementation(() => { });
+
+        // Clear environment variable before each test
+        delete process.env.GTREE_BASE_PATH;
     });
 
     afterEach(() => {
         vi.restoreAllMocks();
+        // Clean up environment variable
+        delete process.env.GTREE_BASE_PATH;
     });
 
     describe('generateTree', () => {
@@ -93,6 +99,42 @@ describe('GtreeService', () => {
             expect(mockSpawn).toHaveBeenCalledTimes(2);
             expect(mockSpawn).toHaveBeenNthCalledWith(1, 'fd', expect.any(Array), { cwd: '/abs/custom/path', env: expect.anything() });
             expect(mockSpawn).toHaveBeenNthCalledWith(2, 'tree', ['.', '--fromfile', '-F', '--dirsfirst', '-C', '-L', '2', '--noreport'], { cwd: '/abs/custom/path' });
+        });
+
+        it('should use GTREE_BASE_PATH environment variable when set', async () => {
+            process.env.GTREE_BASE_PATH = '/workspace/project';
+
+            // Mock path.resolve to handle the base path resolution
+            vi.mocked(path.resolve).mockImplementation((basePath, targetPath?) => {
+                if (targetPath !== undefined) {
+                    return `${basePath}/${targetPath}`;
+                }
+                return `/abs/${basePath}`;
+            });
+
+            mockSpawn
+                .mockReturnValueOnce(createMockProcess('some/file\n', '', 0)) // fd success
+                .mockReturnValueOnce(createMockProcess('output', '', 0)); // tree success
+
+            await GtreeService.generateTree('src', []);
+
+            expect(mockSpawn).toHaveBeenCalledTimes(2);
+            expect(mockSpawn).toHaveBeenNthCalledWith(1, 'fd', expect.any(Array), { cwd: '/workspace/project/src', env: expect.anything() });
+            expect(mockSpawn).toHaveBeenNthCalledWith(2, 'tree', expect.any(Array), { cwd: '/workspace/project/src' });
+        });
+
+        it('should handle absolute paths correctly when GTREE_BASE_PATH is set', async () => {
+            process.env.GTREE_BASE_PATH = '/workspace/project';
+
+            mockSpawn
+                .mockReturnValueOnce(createMockProcess('some/file\n', '', 0)) // fd success
+                .mockReturnValueOnce(createMockProcess('output', '', 0)); // tree success
+
+            await GtreeService.generateTree('/absolute/path', []);
+
+            expect(mockSpawn).toHaveBeenCalledTimes(2);
+            expect(mockSpawn).toHaveBeenNthCalledWith(1, 'fd', expect.any(Array), { cwd: '/absolute/path', env: expect.anything() });
+            expect(mockSpawn).toHaveBeenNthCalledWith(2, 'tree', expect.any(Array), { cwd: '/absolute/path' });
         });
 
         it('should throw error if path does not exist', async () => {

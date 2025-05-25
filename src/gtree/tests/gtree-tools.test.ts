@@ -66,7 +66,7 @@ describe('Gtree MCP Tools (E2E and Unit)', () => {
     describe('Tool Registration (Unit Test)', () => {
         it('should register gtree tool with correct configuration', () => {
             // registerTools is called in beforeEach, so we just check the mock
-            expect(server.addTool).toHaveBeenCalledTimes(1);
+            expect(server.addTool).toHaveBeenCalledTimes(2);
             const toolCall = (server.addTool as any).mock.calls[0][0];
             expect(toolCall.name).toBe('gtree');
             expect(toolCall.description).toContain('Generate a tree view of directory structure');

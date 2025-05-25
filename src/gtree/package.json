@@ -2,7 +2,7 @@
   "name": "@epikem/gtree",
   "module": "src/index.ts",
   "type": "module",
-  "version": "0.2.2",
+  "version": "0.2.5",
   "description": "MCP server that provides directory tree visualization with git-aware filtering",
   "private": false,
   "main": "build/index.js",
